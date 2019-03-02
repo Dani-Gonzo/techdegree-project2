@@ -17,6 +17,10 @@ FSJS project 2 - List Filter and Pagination
    scoped to that function.
 ***/
 
+const studentList = document.querySelectorAll(".student-item");
+const studentUL = document.querySelector("ul");
+
+let page = 2;
 
 
 
@@ -35,6 +39,26 @@ FSJS project 2 - List Filter and Pagination
        "invoke" the function 
 ***/
 
+function showPage(list, page) {
+   let newArray = [];
+   let hiddenArray = [];
+   let hiddenDiv = document.createElement("div");
+   hiddenDiv.style.display = "none";
+
+   for (i = 0; i < list.length; i++) {
+      if (i >= (page-1)*10 && i < page*10) {
+         newArray.push(list[i]);
+      }
+      else {
+         hiddenArray.push(list[i]);
+         for (i = 0; i < hiddenArray.length; i++) {
+            hiddenDiv.appendChild(hiddenArray[i]);
+         }
+      }
+   }
+}
+
+showPage(studentList, page);
 
 
 
@@ -43,6 +67,9 @@ FSJS project 2 - List Filter and Pagination
    functionality to the pagination buttons.
 ***/
 
+function appendPageLinks(list) {
+   
+}
 
 
 
