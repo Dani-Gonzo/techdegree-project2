@@ -67,16 +67,19 @@ function appendPageLinks(list) {
    pageDiv.appendChild(paginationDiv);
    
    for (let i = 1; i <= pagesNeeded; i++) {
-      let links = document.createElement("a");
+      let link = document.createElement("a");
       const listItems = document.createElement("li");
-      links.textContent = i;
-      listItems.appendChild(links);
+      link.textContent = i;
+      listItems.appendChild(link);
       paginationLinks.appendChild(listItems);
-      links.addEventListener("click", (links) => {
-         links.target.className = "active";
+      link.addEventListener("click", (link) => {
+         let aLinks = document.querySelectorAll("a");
+         for (let j = 0; j < aLinks.length; j++) {
+            aLinks[j].className = "";
+         }
+         link.target.className = "active";
          showPage(studentList, i)
       });
-      links.className = "";
    }
 }
 
