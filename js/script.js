@@ -18,9 +18,10 @@ FSJS project 2 - List Filter and Pagination
 ***/
 
 const studentList = document.querySelectorAll(".student-item");
-const studentUL = document.querySelector("ul");
+const pageDiv = document.querySelector("div.page");
 
-let page = 2;
+const maxEntriesPerPage = 10;
+let page = 1;
 
 
 
@@ -40,27 +41,17 @@ let page = 2;
 ***/
 
 function showPage(list, page) {
-   let newArray = [];
-   let hiddenArray = [];
-   let hiddenDiv = document.createElement("div");
-   hiddenDiv.style.display = "none";
-
-   for (i = 0; i < list.length; i++) {
-      if (i >= (page-1)*10 && i < page*10) {
-         newArray.push(list[i]);
+   for (let i = 0; i < list.length; i++) {
+      if (i >= (page-1)*maxEntriesPerPage && i < page*maxEntriesPerPage) {
+         list[i].style.display = "block";
       }
       else {
-         hiddenArray.push(list[i]);
-         for (i = 0; i < hiddenArray.length; i++) {
-            hiddenDiv.appendChild(hiddenArray[i]);
-         }
+         list[i].style.display = "none";
       }
    }
 }
 
 showPage(studentList, page);
-
-
 
 /*** 
    Create the `appendPageLinks function` to generate, append, and add 
@@ -68,10 +59,28 @@ showPage(studentList, page);
 ***/
 
 function appendPageLinks(list) {
+   let paginationLinks = document.createElement("ul");
+   let pagesNeeded = Math.ceil(list.length / maxEntriesPerPage);
+   let paginationDiv = document.createElement("div");
+   paginationDiv.className = "pagination";
+   paginationDiv.appendChild(paginationLinks);
+   pageDiv.appendChild(paginationDiv);
    
+   for (let i = 1; i <= pagesNeeded; i++) {
+      let links = document.createElement("a");
+      const listItems = document.createElement("li");
+      links.textContent = i;
+      listItems.appendChild(links);
+      paginationLinks.appendChild(listItems);
+      links.addEventListener("click", (links) => {
+         links.target.className = "active";
+         showPage(studentList, i)
+      });
+      links.className = "";
+   }
 }
 
-
+appendPageLinks(studentList);
 
 
 // Remember to delete the comments that came with this file, and replace them with your own code comments.
