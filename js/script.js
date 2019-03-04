@@ -2,45 +2,27 @@
 Treehouse Techdegree:
 FSJS project 2 - List Filter and Pagination
 ******************************************/
-   
-// Study guide for this project - https://drive.google.com/file/d/1OD1diUsTMdpfMDv677TfL1xO2CEkykSz/view?usp=sharing
 
-
-/*** 
-   Add your global variables that store the DOM elements you will 
-   need to reference and/or manipulate. 
-   
-   But be mindful of which variables should be global and which 
-   should be locally scoped to one of the two main functions you're 
-   going to create. A good general rule of thumb is if the variable 
-   will only be used inside of a function, then it can be locally 
-   scoped to that function.
-***/
-
+// Global variables
+const maxEntriesPerPage = 10;
+let page = 1; // Initial page
 const studentList = document.querySelectorAll(".student-item");
 const pageDiv = document.querySelector("div.page");
+let noResultsDiv; // Appended div containing "No Results" message
 
-const maxEntriesPerPage = 10;
-let page = 1;
+// Creates, appends and styles "No results found" message to the div with class page
+function ResultsMessage() {
+   noResultsDiv = document.createElement("div");
+   let noResultsMessage = document.createElement("span");
+   noResultsMessage.innerHTML = "No results found";
+   noResultsDiv.appendChild(noResultsMessage);
+   noResultsDiv.style.textAlign = "center";
+   noResultsDiv.style.display = "none";
+   pageDiv.appendChild(noResultsDiv);
+}
 
-
-
-/*** 
-   Create the `showPage` function to hide all of the items in the 
-   list except for the ten you want to show.
-
-   Pro Tips: 
-     - Keep in mind that with a list of 54 students, the last page 
-       will only display four.
-     - Remember that the first student has an index of 0.
-     - Remember that a function `parameter` goes in the parens when 
-       you initially define the function, and it acts as a variable 
-       or a placeholder to represent the actual function `argument` 
-       that will be passed into the parens later when you call or 
-       "invoke" the function 
-***/
-
-function showPage(list, page) {
+// Displays certain number of records per page from a list and hides the rest
+function ShowPage(list, page) {
    for (let i = 0; i < list.length; i++) {
       if (i >= (page-1)*maxEntriesPerPage && i < page*maxEntriesPerPage) {
          list[i].style.display = "block";
@@ -51,39 +33,94 @@ function showPage(list, page) {
    }
 }
 
-showPage(studentList, page);
+// Create page links with event listener
+function CreatePageLinks(list, pageNumber) {
+   let link = document.createElement("a");
+   const listItems = document.createElement("li");
+   link.textContent = pageNumber;
+   listItems.appendChild(link);
+   link.addEventListener("click", (link) => {
+      let aLinks = document.querySelectorAll("a");
+      for (let j = 0; j < aLinks.length; j++) {
+         aLinks[j].className = "";
+      }
+      link.target.className = "active";
+      ShowPage(list, pageNumber)
+   });
+   return listItems;
+}
 
-/*** 
-   Create the `appendPageLinks function` to generate, append, and add 
-   functionality to the pagination buttons.
-***/
-
-function appendPageLinks(list) {
-   let paginationLinks = document.createElement("ul");
+// Add created page links to the page based on number of pages needed for the amount of records in the passed in list
+function AppendPageLinks(list) {
    let pagesNeeded = Math.ceil(list.length / maxEntriesPerPage);
+   let paginationLinks = document.createElement("ul");
+   // Check for an existing div with "pagination" class ...
+   let oldPaginationDiv = document.querySelector("div.pagination");
+   // ... If such a div exists, remove it
+   if (oldPaginationDiv != null) {
+      pageDiv.removeChild(oldPaginationDiv);
+   }
+
    let paginationDiv = document.createElement("div");
    paginationDiv.className = "pagination";
    paginationDiv.appendChild(paginationLinks);
    pageDiv.appendChild(paginationDiv);
-   
+
    for (let i = 1; i <= pagesNeeded; i++) {
-      let link = document.createElement("a");
-      const listItems = document.createElement("li");
-      link.textContent = i;
-      listItems.appendChild(link);
-      paginationLinks.appendChild(listItems);
-      link.addEventListener("click", (link) => {
-         let aLinks = document.querySelectorAll("a");
-         for (let j = 0; j < aLinks.length; j++) {
-            aLinks[j].className = "";
-         }
-         link.target.className = "active";
-         showPage(studentList, i)
-      });
+      paginationLinks.appendChild(CreatePageLinks(list, i));
    }
 }
 
-appendPageLinks(studentList);
+// Create and add a search bar to the page
+function AppendSearchBar() {
+   const pageHeaderDiv = document.querySelector(".page-header");
+   const searchDiv = document.createElement("div");
+   searchDiv.className = "student-search";
+   let userInput = document.createElement("input");
+   userInput.setAttribute("placeholder", "Search for students...");
+   searchDiv.appendChild(userInput);
+   let searchButton = document.createElement("button");
+   searchButton.textContent = "Search";
+   searchDiv.appendChild(searchButton);
+   pageHeaderDiv.appendChild(searchDiv);
+   // Add click event listener for the search button being clicked
+   searchButton.addEventListener("click", () => {
+      SearchFunctionality(userInput, studentList); 
+   });
+   // Add keyup event listener for the input box receiving input
+   userInput.addEventListener("keyup", () => {
+      SearchFunctionality(userInput, studentList); 
+   });
+}
 
+// Add functionality to the search bar
+function SearchFunctionality(input, list) {
+   const names = document.querySelectorAll("h3");
+   const emails = document.querySelectorAll("span.email");
+   let searchNamesArray = [];
+   for (i = 0; i < list.length; i++) {
+      // Check if search bar input contains letters in names or emails arrays ...
+      if (names[i].innerHTML.indexOf(input.value) > -1 || emails[i].innerHTML.indexOf(input.value) > -1) {
+         searchNamesArray.push(list[i]);
+      }
+      // ... If not, set the list item to not display
+      else {
+         list[i].style.display = "none";
+      }
+   }
+   ShowPage(searchNamesArray, 1);
+   AppendPageLinks(searchNamesArray);
 
-// Remember to delete the comments that came with this file, and replace them with your own code comments.
+   // If there are no results that match the input, show the "No results found" message
+   if (searchNamesArray.length == 0) {
+      noResultsDiv.style.display = "block";
+   }
+   else {
+      noResultsDiv.style.display = "none";
+   }
+}
+
+ResultsMessage();
+AppendSearchBar();
+ShowPage(studentList, page);
+AppendPageLinks(studentList);
