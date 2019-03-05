@@ -39,6 +39,9 @@ function CreatePageLinks(list, pageNumber) {
    const listItems = document.createElement("li");
    link.textContent = pageNumber;
    listItems.appendChild(link);
+   if (pageNumber == 1) {
+      link.className = "active";
+   }
    link.addEventListener("click", (link) => {
       let aLinks = document.querySelectorAll("a");
       for (let j = 0; j < aLinks.length; j++) {
